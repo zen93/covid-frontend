@@ -151,8 +151,6 @@ export default {
       }
     },
     async fillData () {
-      // this.loaded = false
-
       try {
         this.$store.commit('dataset/reset')
 
@@ -179,7 +177,7 @@ export default {
 
         this.loaded = true
       } catch (err) {
-        console.error(err)
+        this.$store.commit('setStatus', err.message)
       }
     },
     deleteSource (slug) {
