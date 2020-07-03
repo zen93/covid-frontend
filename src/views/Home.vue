@@ -17,6 +17,9 @@
         <div class="text-center">
           <b-button squared variant="outline-danger" class="mt-2 mb-2" @click="addSource">Add Country to Sources</b-button>
         </div>
+        <b-alert v-model="showStatus" variant="danger" dismissible>
+          {{ status }}
+        </b-alert>
       </div>
 
       <h3>
@@ -59,7 +62,9 @@ export default {
       estimate: null,
       source: null,
       sources: [],
-      chartOptions: null
+      chartOptions: null,
+      status: '',
+      showStatus: false
     }
   },
   mounted () {
@@ -150,6 +155,20 @@ export default {
         maintainAspectRatio: false
       }
     },
+    fillDataWithZeros (data) {
+      for (let i = 0; i < this.IFRDates.length; i++) {
+        const date = this.IFRDates[i]
+        if (data.filter(a => a.date === date).length === 0) {
+          data.push({
+            date,
+            cases: 0
+          })
+        }
+      }
+      // sort data
+      data.sort((a, b) => new Date(a.Date) - new Date(b.Date))
+      return data
+    },
     async fillData () {
       try {
         this.$store.commit('dataset/reset')
@@ -165,7 +184,8 @@ export default {
           color = this.getColor()
           const country = this.$store.getters['country/getCountryBySlug'](source.sourceCountry)
 
-          payload = { label: country.Country, color, data: source.data.map(a => a.cases), slug: country.Slug }
+          const sortedData = this.fillDataWithZeros(source.data)
+          payload = { label: country.Country, color, data: sortedData.map(a => a.cases), slug: country.Slug }
           this.$store.dispatch('dataset/setDataset', payload)
         }
 
@@ -177,6 +197,7 @@ export default {
 
         this.loaded = true
       } catch (err) {
+        console.error(err.stack)
         this.$store.commit('setStatus', err.message)
       }
     },
@@ -194,6 +215,11 @@ export default {
         const country = this.$store.getters['country/getCountryBySlug'](this.source)
         if (country) {
           if (this.sources.filter(a => a.slug === country.Slug).length === 0) {
+            if (this.sources.length === 5) {
+              this.status = 'Cannot add more than 5 countries'
+              this.showStatus = true
+              return
+            }
             this.loaded = false
             this.sources.push({
               slug: country.Slug,
@@ -201,8 +227,17 @@ export default {
             })
             await this.$store.dispatch('estimate/getEstimate', { estimate: this.estimate, sources: this.sources })
             this.fillData()
+          } else {
+            this.status = 'Cannot add the same source country more than once'
+            this.showStatus = true
           }
+        } else {
+          this.status = 'Invalid country'
+          this.showStatus = true
         }
+      } else if (!this.estimate) {
+        this.status = 'Select an estimate country first under "Predict for country"'
+        this.showStatus = true
       }
       this.source = null
     },
