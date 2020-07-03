@@ -13,7 +13,7 @@
           <b-collapse id="faq-1" visible accordion="my-accordion" role="tabpanel">
             <b-card-body>
               <b-card-text>I'm glad you asked.
-                This site is about estimating the true number of people infected with coronavirus in your country.
+                This site is about estimating the true number of people infected with coronavirus (Infected Fatality Rate, IFR) in your country.
               </b-card-text>
             </b-card-body>
           </b-collapse>
@@ -27,7 +27,7 @@
             <b-card-body>
               <b-card-text>To get an estimate of the true infected based on serological testing, select your country from the dropdown under "Predict for country".
                 The results will show up in a graph as "IFR Estimate". Once you have chosen the estimate country, we can select source countries.
-                Source countries are used to estimate the true infected of the estimate country based on the Case Fatality Rate of the source country.
+                Source countries are used to estimate the true infected of the estimate country based on the Case Fatality Rate (CFR) of the source country.
                 <br><br><strong>Example:</strong> Let us select "India" under "Predict for country". It loads the IFR Estimate. Then we select "Korea (south)" under "Sources for prediction".
                 Using the Case Fatality Rate of south korea, we will get a new estimate of the true number of infected in India.
                 Usually, this estimate is lower than IFR Estimate but it can be useful to compare real countries' data in this way.
